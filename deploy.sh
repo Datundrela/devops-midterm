@@ -34,13 +34,13 @@ npm install --production
 echo "Step 4: Starting application with PM2..."
 pm2 stop "$TARGET_ENV" 2>/dev/null
 pm2 delete "$TARGET_ENV" 2>/dev/null
-pm2 start app.js --name "$TARGET_ENV" -- node app.js --port $TARGET_PORT
+PORT=$TARGET_PORT pm2 start app.js --name "$TARGET_ENV"
 
 echo "Step 5: Running Health Check..."
 sleep 5 
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$TARGET_PORT/health)
 
-if curl -s http://localhost:3000/health | grep "OK" > /dev/null; then
+if curl -s http://localhost:$TARGET_PORT/health | grep "OK" > /dev/null; then
     echo "SUCCESS: Health check passed!"
     echo "$TARGET_ENV" > "$ACTIVE_FILE"
     
@@ -48,7 +48,7 @@ if curl -s http://localhost:3000/health | grep "OK" > /dev/null; then
     pm2 stop "$CURRENT_ENV" 2>/dev/null
     echo "DEPLOYMENT COMPLETE!"
 else
-    echo "FAILURE: Health check failed on http://localhost:3000/health"
+    echo "FAILURE: Health check failed on http://localhost:$TARGET_PORT/health"
     pm2 stop "$TARGET_ENV"
     exit 1
 fi
