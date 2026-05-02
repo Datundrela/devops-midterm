@@ -20,9 +20,10 @@ app.post('/submit', (req, res) => {
     res.send(`Received: ${data}`);
 });
 
-// Only start the server if this file is run directly (useful for testing)
 if (require.main === module) {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => {
+        console.log(`SERVER_START: Application listening on port ${PORT}`);
+    });
 }
 
 module.exports = app;
